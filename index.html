@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1e3a8a">
+    <title>Fire Operations Guide</title>
+    
+    <!-- Link to our stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- This manifest file makes the app installable on mobile devices -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- iOS specific settings for when app is added to home screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Fire Ops">
+</head>
+<body>
+    <!-- Main container that holds all our pages -->
+    <div id="app">
+        
+        <!-- HOME PAGE - This is what users see first -->
+        <div id="home-page" class="page active">
+            <header>
+                <h1>Fire Operations Guide</h1>
+            </header>
+            
+            <main class="button-grid">
+                <!-- Four main category buttons - clicking these navigates to category pages -->
+                <button class="category-btn" onclick="showPage('drafting-page')">
+                    DRAFTING
+                </button>
+                
+                <button class="category-btn" onclick="showPage('fire-flow-page')">
+                    FIRE FLOW
+                </button>
+                
+                <button class="category-btn" onclick="showPage('hydrants-page')">
+                    HYDRANTS
+                </button>
+                
+                <button class="category-btn" onclick="showPage('maps-page')">
+                    MAPS & IMAGES
+                </button>
+            </main>
+        </div>
+
+        <!-- DRAFTING LANDING PAGE -->
+        <div id="drafting-page" class="page">
+            <header>
+                <button class="back-btn" onclick="showPage('home-page')">← Back</button>
+                <h1>Drafting</h1>
+            </header>
+            
+            <main class="document-list">
+                <!-- Each link opens the corresponding PDF -->
+                <a href="#" class="doc-link" onclick="openDocument('documents/brush-unit-n100.pdf'); return false;">
+                    Brush Unit N100
+                </a>
+                
+                <a href="#" class="doc-link" onclick="openDocument('documents/caf-draft-brush-trucks.pdf'); return false;">
+                    CAF Draft Brush Trucks
+                </a>
+                
+                <a href="#" class="doc-link" onclick="openDocument('documents/drafting-pumper.pdf'); return false;">
+                    Drafting (Pumper)
+                </a>
+                
+                <a href="#" class="doc-link" onclick="openDocument('documents/engine-50-drafting.pdf'); return false;">
+                    Engine 50 Drafting
+                </a>
+                
+                <a href="#" class="doc-link" onclick="openDocument('documents/hand-pump-draft-trucks.pdf'); return false;">
+                    Hand Pump Draft Trucks
+                </a>
+                
+                <a href="#" class="doc-link" onclick="openDocument('documents/tender-drafting.pdf'); return false;">
+                    Tender Drafting
+                </a>
+            </main>
+        </div>
+
+        <!-- FIRE FLOW LANDING PAGE -->
+        <div id="fire-flow-page" class="page">
+            <header>
+                <button class="back-btn" onclick="showPage('home-page')">← Back</button>
+                <h1>Fire Flow</h1>
+            </header>
+            
+            <main class="document-list">
+                <a href="#" class="doc-link" onclick="openDocument('documents/gpm-psi-calculations.pdf'); return false;">
+                    GPM & PSI Calculations
+                </a>
+                
+                <a href="#" class="doc-link" onclick="openDocument('documents/fire-flow-formula.pdf'); return false;">
+                    Fire Flow Formula
+                </a>
+                
+                <a href="#" class="doc-link" onclick="openDocument('documents/smooth-bore-calculations.pdf'); return false;">
+                    Smooth Bore Calculations
+                </a>
+                
+                <a href="#" class="doc-link" onclick="openDocument('documents/tender-ops-suggestions.pdf'); return false;">
+                    Tender Ops Suggestions
+                </a>
+            </main>
+        </div>
+
+        <!-- HYDRANTS LANDING PAGE -->
+        <div id="hydrants-page" class="page">
+            <header>
+                <button class="back-btn" onclick="showPage('home-page')">← Back</button>
+                <h1>Hydrants</h1>
+            </header>
+            
+            <main class="document-list">
+                <a href="#" class="doc-link" onclick="openDocument('documents/hydrant-pressures-2.5.pdf'); return false;">
+                    Hydrant Pressures 2.5
+                </a>
+                
+                <a href="#" class="doc-link" onclick="openDocument('documents/hydrant-pressures-4.5.pdf'); return false;">
+                    Hydrant Pressures 4.5
+                </a>
+            </main>
+        </div>
+
+        <!-- MAPS & IMAGES LANDING PAGE -->
+        <div id="maps-page" class="page">
+            <header>
+                <button class="back-btn" onclick="showPage('home-page')">← Back</button>
+                <h1>Maps & Images</h1>
+            </header>
+            
+            <main class="document-list">
+                <!-- These can be images (PNG/JPEG) or PDFs -->
+                <a href="#" class="doc-link" onclick="openDocument('documents/pajarito-mesa.pdf'); return false;">
+                    Pajarito Mesa
+                </a>
+                
+                <a href="#" class="doc-link" onclick="openDocument('documents/power-lines-1.pdf'); return false;">
+                    Power Lines 1
+                </a>
+                
+                <a href="#" class="doc-link" onclick="openDocument('documents/power-lines-2.pdf'); return false;">
+                    Power Lines 2
+                </a>
+            </main>
+        </div>
+
+        <!-- DOCUMENT VIEWER PAGE - Shows PDFs and images -->
+        <div id="viewer-page" class="page">
+            <header>
+                <button class="back-btn" onclick="closeDocument()">← Back</button>
+                <h1 id="document-title">Document</h1>
+            </header>
+            
+            <main class="viewer-container">
+                <!-- This iframe will display PDFs -->
+                <iframe id="pdf-viewer" style="display:none;"></iframe>
+                
+                <!-- This img tag will display images (PNG/JPEG) -->
+                <img id="image-viewer" style="display:none;" alt="Document image">
+            </main>
+        </div>
+
+    </div>
+
+    <!-- Link to our JavaScript file that handles all the app functionality -->
+    <script src="app.js"></script>
+</body>
+</html>
