@@ -2,33 +2,33 @@
   "name": "Fire Operations Guide",
   "short_name": "Fire Ops",
   "description": "Quick reference guide for fire department operations including drafting, fire flow, hydrants, and maps",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": ".",
+  "scope": ".",
   "display": "standalone",
   "background_color": "#1e3a8a",
   "theme_color": "#1e3a8a",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "./icon-192.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./icon-192.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "./icon-512.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./icon-512.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

@@ -1,9 +1,9 @@
 // Service Worker - This file runs in the background and manages caching for offline access
 
-const CACHE_NAME = 'fire-ops-v3';
+const CACHE_NAME = 'fire-ops-v4';
 
 // List of files to cache immediately when the service worker is installed
-// Add any files here that you want to be available offline
+// Only cache local files here - external CDN files will be cached on first use
 const urlsToCache = [
   './',
   './index.html',
@@ -11,10 +11,8 @@ const urlsToCache = [
   './app.js',
   './manifest.json',
   './icon-192.png',
-  './icon-512.png',
-  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
-  // Your PDF and image files will be cached automatically when first accessed
+  './icon-512.png'
+  // PDF.js library and your documents will be cached automatically when first accessed
 ];
 
 /**
@@ -36,6 +34,11 @@ self.addEventListener('install', event => {
  * This is where the magic happens - we serve cached files when offline
  */
 self.addEventListener('fetch', event => {
+  // Only handle GET requests
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then(response => {
@@ -48,18 +51,32 @@ self.addEventListener('fetch', event => {
         return fetch(event.request).then(
           fetchResponse => {
             // Don't cache if it's not a valid response
-            if (!fetchResponse || fetchResponse.status !== 200 || fetchResponse.type !== 'basic') {
+            if (!fetchResponse || fetchResponse.status !== 200) {
               return fetchResponse;
             }
 
-            // Clone the response because it can only be consumed once
-            const responseToCache = fetchResponse.clone();
+            // Only cache same-origin requests and CDN resources we trust
+            const responseUrl = new URL(fetchResponse.url);
+            const requestUrl = new URL(event.request.url);
+            
+            // Cache if it's same-origin OR from cdnjs (for PDF.js)
+            const shouldCache = responseUrl.origin === requestUrl.origin || 
+                               responseUrl.hostname === 'cdnjs.cloudflare.com';
 
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                // Cache this file for future offline access
-                cache.put(event.request, responseToCache);
-              });
+            if (shouldCache && fetchResponse.type !== 'error') {
+              // Clone the response because it can only be consumed once
+              const responseToCache = fetchResponse.clone();
+
+              caches.open(CACHE_NAME)
+                .then(cache => {
+                  // Cache this file for future offline access
+                  cache.put(event.request, responseToCache);
+                })
+                .catch(err => {
+                  // Silently fail if caching doesn't work
+                  console.log('Cache put failed:', err);
+                });
+            }
 
             return fetchResponse;
           }
