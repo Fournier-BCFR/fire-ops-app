@@ -101,7 +101,7 @@ async function loadPDF(url) {
 }
 
 /**
- * Render a specific page of the PDF at a good readable size
+ * Render a specific page of the PDF - fits to width at 100%
  */
 async function renderPage(pageNumber) {
     if (!pdfDoc) return;
@@ -120,13 +120,13 @@ async function renderPage(pageNumber) {
         // Get page dimensions at scale 1
         const viewport1 = page.getViewport({ scale: 1.0 });
         
-        // Calculate scale to fit width nicely (slightly larger for readability)
-        const scale = (containerWidth / viewport1.width) * 1.5;
+        // Simply fit to width at 100% - no extra zoom
+        const scale = containerWidth / viewport1.width;
         
         // Get final viewport
         const viewport = page.getViewport({ scale: scale });
         
-        // Set canvas size to the rendered size
+        // Set canvas size
         canvas.width = viewport.width;
         canvas.height = viewport.height;
         
