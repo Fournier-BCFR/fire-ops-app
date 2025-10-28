@@ -138,14 +138,16 @@ header h1 {
     flex: 1;
     background: rgba(255, 255, 255, 0.95);
     border-radius: 12px;
-    overflow: hidden;
+    overflow: auto;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
 }
 
 /* PDF viewer iframe styling */
 #pdf-viewer {
     width: 100%;
     height: calc(100vh - 150px);
+    min-height: 500px;
     border: none;
 }
 
@@ -156,6 +158,7 @@ header h1 {
     display: block;
     object-fit: contain;
     max-height: calc(100vh - 150px);
+    touch-action: pinch-zoom; /* Enable pinch-to-zoom on images */
 }
 
 /* Mobile responsive design */
