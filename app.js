@@ -57,7 +57,12 @@ function openDocument(documentPath) {
         pdfViewer.style.display = 'none';
     } else {
         // It's a PDF - show the PDF viewer and hide the image viewer
-        pdfViewer.src = documentPath;
+        // Add view parameters for better mobile display:
+        // - #view=FitH: Fits the page width to the screen
+        // - This allows users to see the full page and scroll through multi-page PDFs
+        // - Users can pinch to zoom in/out as needed
+        const pdfUrl = documentPath + '#view=FitH';
+        pdfViewer.src = pdfUrl;
         pdfViewer.style.display = 'block';
         imageViewer.style.display = 'none';
     }
