@@ -101,7 +101,7 @@ async function loadPDF(url) {
 }
 
 /**
- * Render a specific page of the PDF - fits to width at 100%
+ * Render a specific page of the PDF with high-DPI support for sharp text
  */
 async function renderPage(pageNumber) {
     if (!pdfDoc) return;
@@ -113,6 +113,9 @@ async function renderPage(pageNumber) {
         const canvas = document.getElementById('pdf-canvas');
         const context = canvas.getContext('2d');
         
+        // Get device pixel ratio for high-DPI displays (Retina, etc.)
+        const pixelRatio = window.devicePixelRatio || 1;
+        
         // Get the container width
         const container = document.querySelector('.viewer-container');
         const containerWidth = container.clientWidth - 40; // Account for padding
@@ -120,15 +123,22 @@ async function renderPage(pageNumber) {
         // Get page dimensions at scale 1
         const viewport1 = page.getViewport({ scale: 1.0 });
         
-        // Simply fit to width at 100% - no extra zoom
+        // Calculate scale to fit width
         const scale = containerWidth / viewport1.width;
         
-        // Get final viewport
+        // Get viewport at display scale
         const viewport = page.getViewport({ scale: scale });
         
-        // Set canvas size
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
+        // Set DISPLAY size (CSS pixels)
+        canvas.style.width = viewport.width + 'px';
+        canvas.style.height = viewport.height + 'px';
+        
+        // Set ACTUAL size (accounting for device pixel ratio for sharpness)
+        canvas.width = viewport.width * pixelRatio;
+        canvas.height = viewport.height * pixelRatio;
+        
+        // Scale the context to match
+        context.scale(pixelRatio, pixelRatio);
         
         // Render the page
         const renderContext = {
