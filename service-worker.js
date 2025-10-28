@@ -1,15 +1,19 @@
 // Service Worker - This file runs in the background and manages caching for offline access
 
-const CACHE_NAME = 'fire-ops-v1';
+const CACHE_NAME = 'fire-ops-v3';
 
 // List of files to cache immediately when the service worker is installed
 // Add any files here that you want to be available offline
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/app.js',
-  '/manifest.json'
+  './',
+  './index.html',
+  './style.css',
+  './app.js',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png',
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
   // Your PDF and image files will be cached automatically when first accessed
 ];
 

@@ -228,6 +228,7 @@ if ('serviceWorker' in navigator) {
  * This makes the app installable like a native app
  */
 let deferredPrompt;
+let installPromptShown = false;
 
 window.addEventListener('beforeinstallprompt', (e) => {
     // Prevent the default mini-infobar from appearing on mobile
@@ -237,7 +238,10 @@ window.addEventListener('beforeinstallprompt', (e) => {
     deferredPrompt = e;
     
     // Create and show our custom install button
-    showInstallPrompt();
+    if (!installPromptShown) {
+        showInstallPrompt();
+        installPromptShown = true;
+    }
 });
 
 /**
@@ -246,7 +250,8 @@ window.addEventListener('beforeinstallprompt', (e) => {
 function showInstallPrompt() {
     const installBtn = document.createElement('div');
     installBtn.className = 'install-prompt';
-    installBtn.textContent = '📱 Install App';
+    installBtn.innerHTML = '📱 Install App';
+    
     installBtn.onclick = async () => {
         if (deferredPrompt) {
             // Show the install prompt
@@ -265,15 +270,38 @@ function showInstallPrompt() {
     };
     
     document.body.appendChild(installBtn);
-    
-    // Auto-hide the prompt after 10 seconds if user doesn't interact
-    setTimeout(() => {
-        if (installBtn && installBtn.parentNode) {
-            installBtn.style.animation = 'slideDown 0.5s ease forwards';
-            setTimeout(() => installBtn.remove(), 500);
-        }
-    }, 10000);
 }
+
+// Show iOS-specific install instructions if on iOS and not in standalone mode
+window.addEventListener('load', () => {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
+    
+    if (isIOS && !isInStandaloneMode && !installPromptShown) {
+        // Show iOS install instructions after a short delay
+        setTimeout(() => {
+            const iosPrompt = document.createElement('div');
+            iosPrompt.className = 'install-prompt ios-prompt';
+            iosPrompt.innerHTML = '📱 Tap <strong>Share</strong> then <strong>Add to Home Screen</strong>';
+            
+            iosPrompt.onclick = () => {
+                iosPrompt.remove();
+            };
+            
+            document.body.appendChild(iosPrompt);
+            
+            // Keep it visible longer for iOS users (30 seconds instead of 10)
+            setTimeout(() => {
+                if (iosPrompt && iosPrompt.parentNode) {
+                    iosPrompt.style.animation = 'slideDown 0.5s ease forwards';
+                    setTimeout(() => iosPrompt.remove(), 500);
+                }
+            }, 30000);
+        }, 2000);
+        
+        installPromptShown = true;
+    }
+});
 
 // Add slideDown animation for hiding the install prompt
 const style = document.createElement('style');

@@ -9,12 +9,20 @@
     <!-- Link to our stylesheet -->
     <link rel="stylesheet" href="style.css">
     
+    <!-- PDF.js library for proper PDF rendering on mobile -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    
     <!-- This manifest file makes the app installable on mobile devices -->
     <link rel="manifest" href="manifest.json">
     
+    <!-- Apple Touch Icons for iOS devices -->
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    
     <!-- iOS specific settings for when app is added to home screen -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Fire Ops">
 </head>
 <body>
@@ -156,9 +164,21 @@
                 <h1 id="document-title">Document</h1>
             </header>
             
+            <!-- PDF Controls - only shown for PDFs -->
+            <div id="pdf-controls" style="display:none;">
+                <button class="pdf-control-btn" onclick="zoomOut()">−</button>
+                <span id="zoom-level">100%</span>
+                <button class="pdf-control-btn" onclick="zoomIn()">+</button>
+                <span style="margin-left: 20px;">Page <span id="page-num">1</span> / <span id="page-count">1</span></span>
+                <button class="pdf-control-btn" onclick="prevPage()">◄</button>
+                <button class="pdf-control-btn" onclick="nextPage()">►</button>
+            </div>
+            
             <main class="viewer-container">
-                <!-- This iframe will display PDFs -->
-                <iframe id="pdf-viewer" style="display:none;"></iframe>
+                <!-- Canvas for rendering PDFs using PDF.js -->
+                <div id="pdf-container" style="display:none;">
+                    <canvas id="pdf-canvas"></canvas>
+                </div>
                 
                 <!-- This img tag will display images (PNG/JPEG) -->
                 <img id="image-viewer" style="display:none;" alt="Document image">
