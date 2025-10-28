@@ -117,8 +117,19 @@ async function renderPage(pageNumber) {
         const canvas = document.getElementById('pdf-canvas');
         const context = canvas.getContext('2d');
         
-        // Get viewport with current scale
-        const viewport = page.getViewport({ scale: scale });
+        // Calculate scale based on container width for better mobile display
+        const container = document.getElementById('pdf-container');
+        const containerWidth = container.clientWidth - 40; // Account for padding
+        
+        // Get the page's default viewport
+        const defaultViewport = page.getViewport({ scale: 1.0 });
+        
+        // Calculate scale to fit container width, then apply user's zoom preference
+        const scaleToFitWidth = containerWidth / defaultViewport.width;
+        const finalScale = scaleToFitWidth * scale;
+        
+        // Get viewport with final scale
+        const viewport = page.getViewport({ scale: finalScale });
         
         // Set canvas dimensions
         canvas.height = viewport.height;
@@ -136,6 +147,9 @@ async function renderPage(pageNumber) {
         document.getElementById('page-num').textContent = pageNumber;
         document.getElementById('zoom-level').textContent = Math.round(scale * 100) + '%';
         
+        // Scroll to top of canvas after rendering
+        canvas.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
     } catch (error) {
         console.error('Error rendering page:', error);
     }
@@ -148,9 +162,6 @@ function nextPage() {
     if (!pdfDoc || currentPage >= pdfDoc.numPages) return;
     currentPage++;
     renderPage(currentPage);
-    
-    // Scroll to top of canvas
-    document.getElementById('pdf-canvas').scrollIntoView({ behavior: 'smooth' });
 }
 
 /**
@@ -160,9 +171,6 @@ function prevPage() {
     if (!pdfDoc || currentPage <= 1) return;
     currentPage--;
     renderPage(currentPage);
-    
-    // Scroll to top of canvas
-    document.getElementById('pdf-canvas').scrollIntoView({ behavior: 'smooth' });
 }
 
 /**
