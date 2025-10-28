@@ -143,6 +143,7 @@ header h1 {
     -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     text-align: center;
     padding: 20px;
+    position: relative; /* Ensure proper stacking context */
 }
 
 /* PDF container that holds the canvas */
@@ -152,6 +153,7 @@ header h1 {
     flex-direction: column;
     align-items: center;
     gap: 10px;
+    min-height: 100%; /* Ensure scrolling works when zoomed */
 }
 
 /* PDF canvas styling */
@@ -159,7 +161,9 @@ header h1 {
     max-width: 100%;
     height: auto;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    touch-action: pinch-zoom; /* Enable pinch-to-zoom */
+    touch-action: pan-y pinch-zoom; /* Enable both scrolling and pinch-zoom */
+    user-select: none; /* Prevent text selection interference */
+    -webkit-user-select: none;
 }
 
 /* PDF controls bar */
