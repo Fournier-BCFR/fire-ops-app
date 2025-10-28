@@ -138,32 +138,33 @@ header h1 {
     flex: 1;
     background: rgba(255, 255, 255, 0.95);
     border-radius: 12px;
-    overflow: auto;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    overflow: scroll; /* Enable scrolling in all directions */
     -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     padding: 20px;
-    position: relative; /* Ensure proper stacking context */
+    position: relative;
+    /* Remove any width constraints */
+    width: 100%;
 }
 
 /* PDF container that holds the canvas */
 #pdf-container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    min-height: 100%; /* Ensure scrolling works when zoomed */
+    display: inline-block; /* Important: allows width to exceed container */
+    min-width: 100%;
+    text-align: center;
 }
 
 /* PDF canvas styling */
 #pdf-canvas {
-    max-width: 100%;
-    height: auto;
+    display: block;
+    margin: 0 auto;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    touch-action: pan-y pinch-zoom; /* Enable both scrolling and pinch-zoom */
-    user-select: none; /* Prevent text selection interference */
+    /* CRITICAL: Allow all touch gestures */
+    touch-action: manipulation; /* Allows browser default pan and zoom */
+    user-select: none;
     -webkit-user-select: none;
+    /* Don't constrain width - let it be as wide as needed */
+    max-width: none !important;
 }
 
 /* PDF controls bar */

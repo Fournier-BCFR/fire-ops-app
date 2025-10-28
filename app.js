@@ -34,10 +34,6 @@ if (typeof pdfjsLib !== 'undefined') {
 // PDF viewing state
 let pdfDoc = null;
 let currentPage = 1;
-let scale = 1.5; // Default zoom level (1.5 = 150%)
-const MAX_SCALE = 3.0;
-const MIN_SCALE = 0.5;
-const SCALE_STEP = 0.25;
 
 /**
  * Open and display a document (PDF or image)
@@ -73,7 +69,7 @@ function openDocument(documentPath) {
     } else {
         // It's a PDF - load it with PDF.js
         imageViewer.style.display = 'none';
-        pdfContainer.style.display = 'block';
+        pdfContainer.style.display = 'inline-block';
         pdfControls.style.display = 'flex';
         
         // Reset to first page
@@ -105,7 +101,7 @@ async function loadPDF(url) {
 }
 
 /**
- * Render a specific page of the PDF
+ * Render a specific page of the PDF at a good readable size
  */
 async function renderPage(pageNumber) {
     if (!pdfDoc) return;
@@ -117,23 +113,22 @@ async function renderPage(pageNumber) {
         const canvas = document.getElementById('pdf-canvas');
         const context = canvas.getContext('2d');
         
-        // Calculate scale based on container width for better mobile display
-        const container = document.getElementById('pdf-container');
+        // Get the container width
+        const container = document.querySelector('.viewer-container');
         const containerWidth = container.clientWidth - 40; // Account for padding
         
-        // Get the page's default viewport
-        const defaultViewport = page.getViewport({ scale: 1.0 });
+        // Get page dimensions at scale 1
+        const viewport1 = page.getViewport({ scale: 1.0 });
         
-        // Calculate scale to fit container width, then apply user's zoom preference
-        const scaleToFitWidth = containerWidth / defaultViewport.width;
-        const finalScale = scaleToFitWidth * scale;
+        // Calculate scale to fit width nicely (slightly larger for readability)
+        const scale = (containerWidth / viewport1.width) * 1.5;
         
-        // Get viewport with final scale
-        const viewport = page.getViewport({ scale: finalScale });
+        // Get final viewport
+        const viewport = page.getViewport({ scale: scale });
         
-        // Set canvas dimensions
-        canvas.height = viewport.height;
+        // Set canvas size to the rendered size
         canvas.width = viewport.width;
+        canvas.height = viewport.height;
         
         // Render the page
         const renderContext = {
@@ -145,10 +140,6 @@ async function renderPage(pageNumber) {
         
         // Update page number display
         document.getElementById('page-num').textContent = pageNumber;
-        document.getElementById('zoom-level').textContent = Math.round(scale * 100) + '%';
-        
-        // Scroll to top of canvas after rendering
-        canvas.scrollIntoView({ behavior: 'smooth', block: 'start' });
         
     } catch (error) {
         console.error('Error rendering page:', error);
@@ -162,6 +153,8 @@ function nextPage() {
     if (!pdfDoc || currentPage >= pdfDoc.numPages) return;
     currentPage++;
     renderPage(currentPage);
+    // Scroll to top of viewer
+    document.querySelector('.viewer-container').scrollTop = 0;
 }
 
 /**
@@ -171,28 +164,8 @@ function prevPage() {
     if (!pdfDoc || currentPage <= 1) return;
     currentPage--;
     renderPage(currentPage);
-}
-
-/**
- * Zoom in on the PDF
- */
-function zoomIn() {
-    if (!pdfDoc) return;
-    if (scale < MAX_SCALE) {
-        scale += SCALE_STEP;
-        renderPage(currentPage);
-    }
-}
-
-/**
- * Zoom out on the PDF
- */
-function zoomOut() {
-    if (!pdfDoc) return;
-    if (scale > MIN_SCALE) {
-        scale -= SCALE_STEP;
-        renderPage(currentPage);
-    }
+    // Scroll to top of viewer
+    document.querySelector('.viewer-container').scrollTop = 0;
 }
 
 /**
@@ -205,11 +178,12 @@ function closeDocument() {
     // Clear PDF state
     pdfDoc = null;
     currentPage = 1;
-    scale = 1.5;
     
     const canvas = document.getElementById('pdf-canvas');
-    const context = canvas.getContext('2d');
-    context.clearRect(0, 0, canvas.width, canvas.height);
+    if (canvas) {
+        const context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+    }
     
     // Go back to whichever page we were on before viewing the document
     showPage(previousPage);

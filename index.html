@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="theme-color" content="#1e3a8a">
     <title>Fire Operations Guide</title>
     
@@ -164,12 +164,9 @@
                 <h1 id="document-title">Document</h1>
             </header>
             
-            <!-- PDF Controls - only shown for PDFs -->
+            <!-- PDF Controls - only page navigation -->
             <div id="pdf-controls" style="display:none;">
-                <button class="pdf-control-btn" onclick="zoomOut()">−</button>
-                <span id="zoom-level">100%</span>
-                <button class="pdf-control-btn" onclick="zoomIn()">+</button>
-                <span style="margin-left: 20px;">Page <span id="page-num">1</span> / <span id="page-count">1</span></span>
+                <span>Page <span id="page-num">1</span> / <span id="page-count">1</span></span>
                 <button class="pdf-control-btn" onclick="prevPage()">◄</button>
                 <button class="pdf-control-btn" onclick="nextPage()">►</button>
             </div>
