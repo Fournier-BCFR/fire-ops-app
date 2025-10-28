@@ -26,6 +26,19 @@ function showPage(pageId) {
     }
 }
 
+// PDF.js configuration
+if (typeof pdfjsLib !== 'undefined') {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+// PDF viewing state
+let pdfDoc = null;
+let currentPage = 1;
+let scale = 1.5; // Default zoom level (1.5 = 150%)
+const MAX_SCALE = 3.0;
+const MIN_SCALE = 0.5;
+const SCALE_STEP = 0.25;
+
 /**
  * Open and display a document (PDF or image)
  * This function determines if the file is an image or PDF and displays it appropriately
@@ -43,9 +56,10 @@ function openDocument(documentPath) {
     
     document.getElementById('document-title').textContent = formattedName;
     
-    // Get references to both viewer elements
-    const pdfViewer = document.getElementById('pdf-viewer');
+    // Get references to viewer elements
+    const pdfContainer = document.getElementById('pdf-container');
     const imageViewer = document.getElementById('image-viewer');
+    const pdfControls = document.getElementById('pdf-controls');
     
     // Check if this is an image or PDF based on file extension
     const extension = documentPath.split('.').pop().toLowerCase();
@@ -54,17 +68,122 @@ function openDocument(documentPath) {
         // It's an image - show the image viewer and hide the PDF viewer
         imageViewer.src = documentPath;
         imageViewer.style.display = 'block';
-        pdfViewer.style.display = 'none';
+        pdfContainer.style.display = 'none';
+        pdfControls.style.display = 'none';
     } else {
-        // It's a PDF - show the PDF viewer and hide the image viewer
-        // Add view parameters for better mobile display:
-        // - #view=FitH: Fits the page width to the screen
-        // - This allows users to see the full page and scroll through multi-page PDFs
-        // - Users can pinch to zoom in/out as needed
-        const pdfUrl = documentPath + '#view=FitH';
-        pdfViewer.src = pdfUrl;
-        pdfViewer.style.display = 'block';
+        // It's a PDF - load it with PDF.js
         imageViewer.style.display = 'none';
+        pdfContainer.style.display = 'block';
+        pdfControls.style.display = 'flex';
+        
+        // Reset to first page
+        currentPage = 1;
+        
+        // Load the PDF
+        loadPDF(documentPath);
+    }
+}
+
+/**
+ * Load and render a PDF using PDF.js
+ */
+async function loadPDF(url) {
+    try {
+        // Load the PDF document
+        const loadingTask = pdfjsLib.getDocument(url);
+        pdfDoc = await loadingTask.promise;
+        
+        // Update page count
+        document.getElementById('page-count').textContent = pdfDoc.numPages;
+        
+        // Render the first page
+        renderPage(currentPage);
+    } catch (error) {
+        console.error('Error loading PDF:', error);
+        alert('Error loading PDF. Please try again.');
+    }
+}
+
+/**
+ * Render a specific page of the PDF
+ */
+async function renderPage(pageNumber) {
+    if (!pdfDoc) return;
+    
+    try {
+        // Get the page
+        const page = await pdfDoc.getPage(pageNumber);
+        
+        const canvas = document.getElementById('pdf-canvas');
+        const context = canvas.getContext('2d');
+        
+        // Get viewport with current scale
+        const viewport = page.getViewport({ scale: scale });
+        
+        // Set canvas dimensions
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        
+        // Render the page
+        const renderContext = {
+            canvasContext: context,
+            viewport: viewport
+        };
+        
+        await page.render(renderContext).promise;
+        
+        // Update page number display
+        document.getElementById('page-num').textContent = pageNumber;
+        document.getElementById('zoom-level').textContent = Math.round(scale * 100) + '%';
+        
+    } catch (error) {
+        console.error('Error rendering page:', error);
+    }
+}
+
+/**
+ * Navigate to the next page
+ */
+function nextPage() {
+    if (!pdfDoc || currentPage >= pdfDoc.numPages) return;
+    currentPage++;
+    renderPage(currentPage);
+    
+    // Scroll to top of canvas
+    document.getElementById('pdf-canvas').scrollIntoView({ behavior: 'smooth' });
+}
+
+/**
+ * Navigate to the previous page
+ */
+function prevPage() {
+    if (!pdfDoc || currentPage <= 1) return;
+    currentPage--;
+    renderPage(currentPage);
+    
+    // Scroll to top of canvas
+    document.getElementById('pdf-canvas').scrollIntoView({ behavior: 'smooth' });
+}
+
+/**
+ * Zoom in on the PDF
+ */
+function zoomIn() {
+    if (!pdfDoc) return;
+    if (scale < MAX_SCALE) {
+        scale += SCALE_STEP;
+        renderPage(currentPage);
+    }
+}
+
+/**
+ * Zoom out on the PDF
+ */
+function zoomOut() {
+    if (!pdfDoc) return;
+    if (scale > MIN_SCALE) {
+        scale -= SCALE_STEP;
+        renderPage(currentPage);
     }
 }
 
@@ -73,8 +192,16 @@ function openDocument(documentPath) {
  */
 function closeDocument() {
     // Clear the viewers
-    document.getElementById('pdf-viewer').src = '';
     document.getElementById('image-viewer').src = '';
+    
+    // Clear PDF state
+    pdfDoc = null;
+    currentPage = 1;
+    scale = 1.5;
+    
+    const canvas = document.getElementById('pdf-canvas');
+    const context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
     
     // Go back to whichever page we were on before viewing the document
     showPage(previousPage);
